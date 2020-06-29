@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Button, ActivityIndicator, Text } from 'react-native';
 import FormRow from '../components/FormRow';
 import firebase from 'firebase';
+import Messages from '../util/messages';
 
 export default class LoginScreen extends React.Component {
 
@@ -9,8 +10,11 @@ export default class LoginScreen extends React.Component {
         super(props);
 
         this.state = {
+            user: null,
             email: '',
-            password: ''
+            password: '',
+            isLoading: false,
+            message: ''
         };
 
     }
@@ -28,7 +32,8 @@ export default class LoginScreen extends React.Component {
             measurementId: "G-B9EG28VNG4"
           };
 
-          firebase.initializeApp(firebaseConfig);
+          if (!firebase.apps.length)
+            firebase.initializeApp(firebaseConfig);
 
     }
 
@@ -37,19 +42,48 @@ export default class LoginScreen extends React.Component {
     }
 
     tryLogin() {
-        console.log('state ->', this.state);
+
+        this.setState({isLoading: true, message: ''});
 
         const { email, password } = this.state;
 
         firebase.auth().signInWithEmailAndPassword(email, password).then( user => {
 
-          console.log('====================================');
-          console.log('Usuário autenticado ->', user);
-          console.log('====================================');
+            this.setState({ message: Messages.loginSuccessMessage(),
+                            user: user
+                         });
+
         }).catch( error => {
-          console.log('error ao logar ->', error);
-          
-        });
+
+            this.setState({ message: Messages.loginErrorMessage(error.code) });
+
+        }).then( ()=> { this.setState({isLoading: false}); });
+
+    }
+
+    renderButton() {
+
+        if ( this.state.isLoading)
+            return <ActivityIndicator />;
+
+        return (
+        <Button 
+            title='ENTRAR'
+            onPress={ () => this.tryLogin()}
+        />)
+    }
+
+    renderMessage() {
+        const {message} = this.state;
+
+        if (!message)
+            return null;
+        
+            return (
+                <View>
+                    <Text> {message} </Text>
+                </View>
+            );
     }
 
     render () {
@@ -72,11 +106,9 @@ export default class LoginScreen extends React.Component {
                         onChangeText={value => this.onChangeInput('password', value) }/>
                 </FormRow>
 
-                        <Button 
-                            title='ENTRAR'
-                            onPress={ () => this.tryLogin()}
-                            />
+                { this.renderButton() }
 
+                { this.renderMessage() }
 
             </View>
         )
