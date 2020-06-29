@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TextInput, StyleSheet, Button, ActivityIndicator, Text } from 'react-native';
 import FormRow from '../components/FormRow';
 import firebase from 'firebase';
-import Messages from '../util/messages';
+import { MessagesComponent } from '../components/messagesComponent';
 
 export default class LoginScreen extends React.Component {
 
@@ -14,7 +14,8 @@ export default class LoginScreen extends React.Component {
             email: '',
             password: '',
             isLoading: false,
-            message: ''
+            message: null,
+            error: false
         };
 
     }
@@ -43,19 +44,23 @@ export default class LoginScreen extends React.Component {
 
     tryLogin() {
 
-        this.setState({isLoading: true, message: ''});
+        this.setState({isLoading: true, 
+                       message: null,
+                       error: false});
 
         const { email, password } = this.state;
 
         firebase.auth().signInWithEmailAndPassword(email, password).then( user => {
 
-            this.setState({ message: Messages.loginSuccessMessage(),
-                            user: user
+            this.setState({ 
+                            message: 'auth/success',
+                            user: user,
+                            error: false
                          });
 
         }).catch( error => {
 
-            this.setState({ message: Messages.loginErrorMessage(error.code) });
+            this.setState({ message: error.code, error: true });
 
         }).then( ()=> { this.setState({isLoading: false}); });
 
@@ -74,42 +79,51 @@ export default class LoginScreen extends React.Component {
     }
 
     renderMessage() {
-        const {message} = this.state;
+        const {error, message} = this.state;
 
-        if (!message)
+        if (!error && !message)
             return null;
+        
+        if(error)
+            return (
+                <View>
+                    <MessagesComponent messageStatus={ this.state}></MessagesComponent>
+                </View>
+            );
         
             return (
                 <View>
-                    <Text> {message} </Text>
+                    <MessagesComponent messageStatus={ this.state}></MessagesComponent>
                 </View>
             );
     }
 
     render () {
         return (
-            <View style={styles.container}>
-                <FormRow first>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder='email/user'
-                        value={this.state.email}
-                        onChangeText={value => this.onChangeInput('email', value) } />
-                </FormRow>
-                
-                <FormRow last>
-                    <TextInput  
-                        style={styles.input}
-                        placeholder='password'
-                        secureTextEntry={true}
-                        value={this.state.password}
-                        onChangeText={value => this.onChangeInput('password', value) }/>
-                </FormRow>
-
-                { this.renderButton() }
-
+            <View>
                 { this.renderMessage() }
+                <View style={styles.container}>
+                    <FormRow first>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder='email/user'
+                            value={this.state.email}
+                            onChangeText={value => this.onChangeInput('email', value) } />
+                    </FormRow>
+                    
+                    <FormRow last>
+                        <TextInput  
+                            style={styles.input}
+                            placeholder='password'
+                            secureTextEntry={true}
+                            value={this.state.password}
+                            onChangeText={value => this.onChangeInput('password', value) }/>
+                    </FormRow>
 
+                    { this.renderButton() }
+
+
+                </View>
             </View>
         )
     }
