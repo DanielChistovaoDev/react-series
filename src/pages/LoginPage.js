@@ -3,8 +3,9 @@ import { View, TextInput, StyleSheet, Button, ActivityIndicator, Text } from 're
 import FormRow from '../components/FormRow';
 import firebase from 'firebase';
 import { MessagesComponent } from '../components/messagesComponent';
+import { AntDesign } from '@expo/vector-icons'; 
 
-export default class LoginScreen extends React.Component {
+export default class LoginPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -84,18 +85,24 @@ export default class LoginScreen extends React.Component {
         if (!error && !message)
             return null;
         
-        if(error)
-            return (
-                <View>
-                    <MessagesComponent messageStatus={ this.state}></MessagesComponent>
-                </View>
-            );
+        return (
+            <View>
+                <MessagesComponent messageStatus={ this.state}></MessagesComponent>
+            </View>
+        );
         
-            return (
-                <View>
-                    <MessagesComponent messageStatus={ this.state}></MessagesComponent>
-                </View>
-            );
+
+    }
+
+    renderNewUser() {
+        return (
+            <View>
+              
+                <AntDesign name="adduser" size={24} color="black" />
+                <Text> Ainda não é cadastrado ? </Text>
+                <Text>  Digite seu e-mail e uma senha e clique aqui para criar um novo usuário</Text>
+            </View>
+        );
     }
 
     render () {
@@ -122,7 +129,7 @@ export default class LoginScreen extends React.Component {
 
                     { this.renderButton() }
 
-
+                    {this.renderNewUser()}
                 </View>
             </View>
         )

@@ -17,8 +17,6 @@ export class MessagesComponent extends React.Component {
     }
 
     render() {
-        console.log('props->', this.props);
-
         if ( this.state.message.includes('auth')) {
 
                 return (
