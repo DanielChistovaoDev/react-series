@@ -94,13 +94,44 @@ export default class LoginPage extends React.Component {
 
     }
 
+    createNewUser() {
+        this.setState({isLoading: true, 
+            message: null,
+            error: false});
+
+        const { email, password } = this.state;
+
+        firebase.auth().createUserWithEmailAndPassword(email, password).then(newUser => {
+            this.setState({ 
+                message: 'auth/createSuccess',
+                user: newUser,
+                error: false
+             });
+
+        }
+        ).catch( error => {
+            console.log('error.message', error.message);
+            console.log('error.code', error.code);
+            
+            this.setState({ message: error.code, error: true });
+
+        }).then( ()=> { this.setState({isLoading: false}); });
+    }
+
     renderNewUser() {
+        if ( !this.state.isLoading)
         return (
             <View>
-              
-                <AntDesign name="adduser" size={24} color="black" />
-                <Text> Ainda não é cadastrado ? </Text>
-                <Text>  Digite seu e-mail e uma senha e clique aqui para criar um novo usuário</Text>
+                <View style={styles.containerNewUser}>
+                
+                    <AntDesign name="adduser" style={styles.iconNewUser} size={50} color="black" />
+                    <Text style={styles.iconNewUser}> Ainda não é cadastrado ? </Text>
+                    <Text style={styles.iconNewUser}>  Digite seu e-mail e uma senha e 
+                                <Text style={styles.cliqueAquiNewUser} 
+                                onPress={()=> {this.createNewUser()  }}> clique aqui </Text>
+                                 para criar um novo usuário
+                    </Text>
+                </View>
             </View>
         );
     }
@@ -129,7 +160,7 @@ export default class LoginPage extends React.Component {
 
                     { this.renderButton() }
 
-                    {this.renderNewUser()}
+                    { this.renderNewUser() }
                 </View>
             </View>
         )
@@ -140,6 +171,17 @@ const styles = StyleSheet.create({
     container: {
         paddingLeft: 10,
         paddingRight: 10
+    },
+    containerNewUser: {
+        padding: 50
+    },
+    iconNewUser: {
+        textAlign: 'center'
+    },
+    cliqueAquiNewUser: {
+        color: '#0096c7',
+        fontWeight: 'bold',
+        fontSize: 15
     },
     input: {
         paddingLeft: 5,

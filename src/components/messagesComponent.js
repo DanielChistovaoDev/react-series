@@ -28,7 +28,7 @@ export class MessagesComponent extends React.Component {
                                        style={ styles.icon }  />
 
                             <Text style={styles.message}> {  
-                                                       this.state.error ? Messages.loginErrorMessage(this.state.message) : Messages.loginSuccessMessage()
+                                                       this.state.error ? Messages.loginErrorMessage(this.state.message) : Messages.loginSuccessMessage(this.state.message)
                                                 } 
                             </Text>    
                         </Text> 
